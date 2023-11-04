@@ -90,7 +90,7 @@ function displayRecentChats() {
     if (!$conn) {
         echo "Database connection error" . mysqli_connect_error();
     }
-    $sql = "SELECT u.fname, u.lname, 
+    $sql = "SELECT u.fname, u.lname, u.img,
             SEC_TO_TIME(TIME_TO_SEC(NOW()) - TIME_TO_SEC(u.logout_time)) AS logout_duration,
             DATE(u.logout_time) AS logout_date, TIME(u.logout_time) AS logout_time
             FROM users AS u
@@ -106,8 +106,9 @@ function displayRecentChats() {
 		echo '<th>Logout Time</th>';
         echo '</tr>';
         while ($row = mysqli_fetch_assoc($result)) {
+            
             echo '<tr>';
-            echo '<td>' . $row['fname'] . ' ' . $row['lname'] . '</td>';
+            echo '<td><img class="profile-image" src="php/images/'.$row['img'].'" alt="">' . $row['fname'] . ' ' . $row['lname'] . '</td>';
             echo '<td>' . $row['logout_duration'] . ' ago</td>';
             echo '<td>' . $row['logout_date'] . '</td>';
 			echo '<td>' . $row['logout_time'] . '</td>';
@@ -117,8 +118,6 @@ function displayRecentChats() {
     } else {
         echo "Error: " . mysqli_error($conn);
     }
-
-    // Close the database connection
     mysqli_close($conn);
 }
 
@@ -161,7 +160,7 @@ function displayOnlineVisitors() {
     }
 
     // Define the SQL query to retrieve online and offline visitors with status and time
-    $sql = "SELECT u.fname, u.lname, u.country, u.status, u.login_time, u.logout_time, u.user_ip
+    $sql = "SELECT u.fname, u.lname, u.img, u.country, u.status, u.login_time, u.logout_time, u.user_ip
             FROM users AS u
             WHERE u.status IN ('Active now', 'Offline now') ORDER BY u.login_time DESC";
 
@@ -180,7 +179,7 @@ function displayOnlineVisitors() {
         
         while ($row = mysqli_fetch_assoc($result)) {
             echo '<tr>';
-            echo '<td>' . $row['fname'] . ' ' . $row['lname'] . '</td>';
+            echo '<td><img class="profile-image" src="php/images/'.$row['img'].'" alt="">' . $row['fname'] . ' ' . $row['lname'] . '</td>';
         
             $locationInfo = getIPGeolocation($row['user_ip']);
             
@@ -223,7 +222,6 @@ echo '</table>';
 
 
 function displayLiveChats() {
-    // Initialize your database connection
     $hostname = "localhost";
     $username = "root";
     $password = "";
@@ -233,14 +231,10 @@ function displayLiveChats() {
     if (!$conn) {
         echo "Database connection error" . mysqli_connect_error();
     }
-
-    // Define the SQL query to retrieve users who are currently chatting and their login duration
-    $sql = "SELECT u.fname, u.lname, DATE(u.login_time) AS login_date, TIME(u.login_time) AS login_time,
+    $sql = "SELECT u.fname, u.lname, u.img, DATE(u.login_time) AS login_date, TIME(u.login_time) AS login_time,
             SEC_TO_TIME(TIME_TO_SEC(NOW()) - TIME_TO_SEC(u.login_time)) AS login_duration
             FROM users AS u
             WHERE u.status = 'Active now' ORDER BY u.login_time DESC";
-
-    // Execute the query
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
@@ -253,7 +247,7 @@ function displayLiveChats() {
         echo '</tr>';
         while ($row = mysqli_fetch_assoc($result)) {
             echo '<tr>';
-            echo '<td>' . $row['fname'] . ' ' . $row['lname'] . '</td>';
+            echo '<td><img class="profile-image" src="php/images/'.$row['img'].'" alt="">  ' . $row['fname'] . ' ' . $row['lname'] . '</td>';
             echo '<td>' . $row['login_duration'] . ' ago</td>';
 			echo '<td>' . $row['login_date'] . '</td>';
 			echo '<td>' . $row['login_time'] . '</td>';
@@ -357,6 +351,12 @@ function displayLiveChats() {
       .bd-mode-toggle .dropdown-menu .active .bi {
         display: block !important;
       }
+      .profile-image {
+            width: 30px; /* Adjust the size as needed */
+            height: 30px; /* Adjust the size as needed */
+            border-radius: 50%; /* Creates a circular shape */
+            object-fit: cover; /* Ensures the image fits the circle */
+        }
     </style>
     <style>
         body {
